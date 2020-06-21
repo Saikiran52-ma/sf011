@@ -1,0 +1,20 @@
+<apex:page controller="SortingController" id="My_Page" tabStyle="contact">
+ <apex:form >
+   <apex:pageBlock title="Sort Contact" id="Contacts_list">
+     <apex:pageblocktable value="{!contacts}" var="con">
+       <apex:column value="{!con.FirstName}">
+         <apex:facet name="header">
+           <apex:commandLink action="{!sortByFirstname}" reRender="Contacts_list">First Name</apex:commandLink>
+         </apex:facet>
+       </apex:column>
+       <apex:column value="{!con.LastName}">
+        <apex:facet name="header">
+           <apex:commandLink action="{!sortByLastname}" reRender="Contacts_list">Contact Name</apex:commandLink>
+         </apex:facet>
+       </apex:column>
+       <apex:column value="{!con.email}"/>
+       <apex:column value="{!con.phone}"/>
+    </apex:pageblocktable>
+   </apex:pageBlock>
+ </apex:form> 
+</apex:page>

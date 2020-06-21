@@ -1,0 +1,17 @@
+<apex:page controller="WrapperController" id="My_page_WP" tabStyle="Contact">
+ <apex:form >
+  <apex:pageBlock >
+   <apex:pageblockTable value="{!contacts}" var="c" id="table">
+    <apex:column >
+       <apex:inputCheckbox value="{!c.selected}"/>
+    </apex:column>
+    <apex:column value="{!c.con.Name}"/>
+    <apex:column value="{!c.con.Email}"/>
+    <apex:column value="{!c.con.phone}"/>
+   </apex:pageblockTable>
+   <apex:pageBlockButtons >
+     <apex:commandButton value="Process Selected" action="{!processSelected}" reRender="table"/>
+   </apex:pageBlockButtons>
+  </apex:pageBlock>
+ </apex:form>
+</apex:page>

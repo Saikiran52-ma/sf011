@@ -1,0 +1,10 @@
+<apex:page renderAs="pdf" standardController="Account" id="MyFourthPage">
+  
+  <p><b>This is PDF format for the Logged In {!$User.FirstName} + '' + {!$User.LastName}</b></p>
+  
+  <apex:panelGrid id="MyPGD" width="100%" bgcolor="#FF4136" columns="2" >
+    <apex:outputtext value="{!Account.Name}"></apex:outputtext>
+    <apex:outputtext value="{!Now()}"></apex:outputtext>
+  </apex:panelGrid>
+  
+</apex:page>

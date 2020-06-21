@@ -1,0 +1,54 @@
+<apex:page Controller="Contact_PaginationCntrl" tabStyle="Contact" id="MyCon_PG">
+ 
+ <apex:form >
+  <apex:actionFunction name="refreshPagesize" action="{!refreshPageSize}" reRender="My_Pg_PB" status="fetchStatus"/>
+   <apex:pageBlock id="My_Pg_PB">
+     <apex:pageblockSection title="All Contacts" collapsible="false" columns="1">
+       <apex:pageblocktable value="{!contacts}" var="conobj">
+         <apex:column headerValue="First Name">
+            <apex:outputField value="{!conobj.FirstName}"/>
+          </apex:column>
+          <apex:column headerValue="Last Name">
+            <apex:outputField value="{!conobj.LastName}"/>
+          </apex:column>
+          <apex:column headerValue="Account Name">
+            <apex:outputField value="{!conobj.Account.Name}"/>
+          </apex:column>
+          <apex:column headerValue="Email">
+            <apex:outputField value="{!conobj.email}"/>
+          </apex:column>
+          <apex:column headerValue="Phone Name">
+            <apex:outputField value="{!conobj.Phone}"/>
+          </apex:column>
+          <apex:column headerValue="Created Date">
+            <apex:outputField value="{!conobj.Createddate}"/>
+          </apex:column> 
+      </apex:pageblocktable>
+      
+      <apex:panelGrid columns="8">
+         <apex:selectlist value="{!size}" Multiselect="False" size="1" onChange="refreshPageSize();">
+            <apex:selectoptions value="{!PaginationSizeOptions}"/>  
+        </apex:selectlist>
+      
+        <apex:commandButton value="First" action="{!setCon.First}" disabled="{!!setCon.hasPrevious}" title="First Page" status="fetchStatus" rerender="My_Pg_PB"/>
+        <apex:commandButton value="Previous" action="{!setCon.Previous}" disabled="{!!setCon.hasPrevious}" title="Previous Page" status="fetchStatus" rerender="My_Pg_PB"/>
+        <apex:commandButton value="Next" action="{!setCon.Next}" disabled="{!!setCon.hasNext}" title="Next Page" status="fetchStatus" rerender="My_Pg_PB"/>
+        <apex:commandButton value="Last" action="{!setCon.Last}" disabled="{!!setCon.hasNext}" title="Last Page" status="fetchStatus" rerender="My_Pg_PB"/>
+      
+        <apex:outputText >
+        {!(SetCon.pageNumber * size) +1 - size} - {!If((setCon.pageNumber *size) > noOfRecords, noofRecords,(setCon.PageNumber * size))} of {!noOfrecords}
+        </apex:outputText>
+        
+        <apex:outputpanel >
+          <Apex:actionstatus >
+            <apex:facet name="Start">
+              <img src="/img/loading.gif" />   
+            </apex:facet>
+         </Apex:actionstatus>
+        </apex:outputpanel>
+        
+      </apex:panelGrid>
+     </apex:pageblockSection>
+   </apex:pageBlock>
+ </apex:form> 
+</apex:page>

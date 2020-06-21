@@ -1,0 +1,574 @@
+<apex:page controller="PacketPDFController" applyBodyTag="false" applyHtmlTag="false" showHeader="false" standardStylesheets="false" renderAs="pdf">
+    <head>
+        <style type="text/css">
+            .lineitem-table,
+            .header-table,
+            .packet-table {
+            border-collapse: collapse;
+            table-layout: fixed;
+            }          
+            .lineitem-table,
+            .header-table {
+            width: 100%;
+            }          
+            .packet-table {
+            width: 75%;
+            }
+            .lineitem-table td,
+            .packet-table td {
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+            padding: 4px 2px;
+            border-style: solid;
+            border-width: 1px;
+            border-color: #000000;
+            color: #000000;
+            background-color: #FFFFFF;
+            word-wrap: break-word;
+            }
+            .break-small {
+            width: 100%;
+            height: 10px;
+            }
+            .lineitem-table-header,
+            .catering-info-header {
+            padding: 5px 5px !important;
+            font-family: Arial, sans-serif;
+            font-size: 10px !important;
+            font-weight: bold;
+            border-style: solid;
+            border-width: 1px;
+            border-color: #000000;
+            color: #000000;
+            background-color: #B9C9FE;
+            }
+            .member-header {
+            padding: 5px 5px !important;
+            font-family: Arial, sans-serif;
+            font-size: 10px !important;
+            font-weight: bold;
+            border: 1px solid #000000;
+            color: #000000;
+            background-color: #B9C9FE;
+            text-align: center !important;
+            }
+            .member-content,
+            .catering-info-content {
+            border-bottom: 1px solid #000000;
+            border-left: 1px solid #000000;
+            border-right: 1px solid #000000;
+            padding: 4px 2px;
+            font-family: Arial, sans-serif;
+            font-size: 10px !important;
+            }
+            .no-break {
+            page-break-inside: avoid;
+            padding-bottom: 12px;
+            }
+            .td1 {
+            font-weight: bold;
+            text-align: left;
+            }
+            .td2 {
+            font-weight: bold;
+            background-color: #B9C9FE !important;
+            }
+            .fh {
+            background-color: #B9C9FE !important;
+            padding: 5px 2px !important;
+            text-align: center !important;
+            }
+            .t1 .td3 {
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+            color: #000000;
+            background-color: #FFFFFF;
+            width: 30%;
+            }
+            .td3 {
+            vertical-align: top !important;
+            }
+            .t1 .td4 {
+            width: 4%;
+            }
+            .t1 {
+            border-collapse: collapse;
+            table-layout: fixed;
+            width: 100%;
+            }
+            .member-content div {
+            padding: 1px 0px;
+            }
+            .group-content {
+            font-family: Arial, sans-serif;
+            font-size: 10px !important;
+            padding-top: 5px;
+            }
+            integer counter = 0;
+            @page:first {
+            @bottom-center {
+            content: counter();
+            font-weight: lighter;
+            font-size: 8pt;
+            }
+            }
+            @page {
+            @bottom-center {
+            content: "Page " counter(page) " of " counter(pages);
+            font-weight: lighter;
+            font-size: 8pt;
+            }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- HEADER -->
+        <div class="no-break">
+            <div style="width:100%">
+                <table class="header-table">
+                    <tr>
+                        <td style="width:50%">
+                            <apex:image value="{!URLFOR($Resource.ChartersLogo1)}" />
+                            <div class="group-content">
+                                <span style="font-weight:bold;">United Catering Ops Group Contact</span>
+                                <br/>
+                                (872) 825-FOOD (3663)
+                                <br/>
+                                cateringops@united.com
+                            </div>
+                        </td>
+                        <td style="width:50%">
+                            <table class="packet-table" align="right">
+                                <apex:outputPanel layout="none" rendered="{!packet.Revision_Num__c > 0}">
+                                    <tr>
+                                        <td colspan="2" style="background-color: yellow; font-weight:bold;" align="center">
+                                            REVISION {!packet.Revision_Num__c}
+                                        </td>
+                                    </tr>
+                                </apex:outputPanel>
+                                <tr>
+                                    <td class="td2" style="width: 30%;">
+                                        Packet #
+                                    </td>
+                                    <td style="width:70%;">
+                                        {!packet.Packet_Number__c}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td2">Issue Date</td>
+                                    <td><apex:outputField value="{!packet.Issue_Date__c}" /></td>
+                                </tr>
+                                <tr>
+                                    <td class="td2">Customer</td>
+                                    <td>{!packet.Account_Name__c}</td>
+                                </tr>
+                                <tr>
+                                    <td class="td2">PAX</td>
+                                    <td>{!packet.PAX_Count__c}</td>
+                                </tr>
+                                <tr>
+                                    <td class="td2">Crew</td>
+                                    <td>{!packet.Total_Crew_Count__c}</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <!-- /HEADER -->
+        <!-- FLIGHTS -->
+        <div class="no-break">
+            <table class="lineitem-table">
+                <tr>
+                    <td class="td1 fh" style="width:10%">Flight #</td>
+                    <td class="td1 fh" style="width:10%">Deptarture Date</td>
+                    <td class="td1 fh" style="width:10%">Arrival Date</td>
+                    <td class="td1 fh" style="width:6%">DOW</td>
+                    <td class="td1 fh" style="width:7%">Origin</td>
+                    <td class="td1 fh" style="width:7%">Dep.Time	</td>
+                    
+                    <td class="td1 fh" style="width:7%">Arrival</td>
+                    <td class="td1 fh" style="width:7%">Arrv Time</td>
+                    
+                    <td class="td1 fh" style="width:6%">A/C</td>
+                    <td class="td1 fh" style="width:9%">Block Time</td>
+                    <td class="td1 fh" style="width:9%">Type</td>
+                    <td class="td1 fh">Loading Begins</td>
+                </tr>
+                <apex:repeat value="{!flights}" var="f" id="flightsRepeat">
+                    <tr>
+                        <td><center>{!f.Flight_Number__c}</center></td>
+                        <td>
+                            <center><apex:outputField value="{!f.Departure_Date__c}" /></center>
+                        </td>
+                        <td>
+                            <center><apex:outputField value="{!f.Arrival_Date__c}" /></center>
+                        </td>
+                        <td><center>{!f.Catering_DOW__c}</center></td>
+                        <td><center>{!f.Departure_Location__c}</center></td>
+                      <td>  <center><apex:outputField value="{!f.Dept_Time_24hours__c}" /></center></td>
+                        <td><center>{!f.Arrival_Location__c}</center></td>
+                       <td> <center><apex:outputField value="{!f.Arrival_Time_24hours__c}" /></center></td>
+                        <td><center>{!f.A_C_Type__c}</center></td>
+                        <td>
+                            <center><apex:outputField value="{!f.Block_Time_24hr__c}" /></center>
+                        </td>
+                        <td><center>{!f.Type__c}</center></td>
+                        <td>
+                            <center><apex:outputField value="{!f.Catering_Loading_Begins_24hr__c}" /></center>
+                        </td>
+                    </tr>
+                </apex:repeat>
+            </table>
+        </div>
+        <!-- /FLIGHTS -->
+        <!-- MEMEBRS -->
+        <div class="no-break">
+            <table class="t1">
+                <tr>
+                    <td class="td3">
+                        <div class="member-header">
+                            United Catering Contact
+                        </div>
+                        <div class="member-content">
+                            <div>
+                                <apex:outputField value="{!memberAdmin.Name__c}" />&nbsp;
+                            </div>
+                            <div>
+                                <apex:outputField value="{!memberAdmin.Email__c}" />&nbsp;
+                            </div>
+                            <div>
+                                <apex:outputField value="{!memberAdmin.Phone__c}" />&nbsp;
+                            </div>
+                        </div>
+                    </td>
+                    <td class="td4"></td>
+                    <td class="td3">
+                        <div class="member-header">
+                            Inflight Coordinator
+                        </div>
+                        <div class="member-content">
+                            <div>
+                                <apex:outputField value="{!memberIfc.Name__c}" />&nbsp;
+                            </div>
+                            <div>
+                                <apex:outputField value="{!memberIfc.Email__c}" />&nbsp;
+                            </div>
+                            <div>
+                                <apex:outputField value="{!memberIfc.Phone__c}" />&nbsp;
+                            </div>
+                        </div>
+                    </td>
+                    <td class="td4"></td>
+                    <td class="td3">
+                        <div class="member-header">
+                            Charter Planner
+                        </div>
+                        <div class="member-content">
+                            <div>
+                                <apex:outputField value="{!memberPlanner.Name__c}" />&nbsp;
+                            </div>
+                            <div>
+                                <apex:outputField value="{!memberPlanner.Email__c}" />&nbsp;
+                            </div>
+                            <div>
+                                <apex:outputField value="{!memberPlanner.Phone__c}" />&nbsp;
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <!-- /MEMEBRS -->
+        <!-- STATIONS -->
+        <div class="no-break">
+            <table class="t1">
+                <tr>
+                    <apex:outputPanel layout="none" rendered="{!station1.Station != null}">
+                        
+                        <td class="td3">
+                            <div class="member-header">
+                                Station 1
+                            </div>
+                            <div class="member-content">
+                                <div>
+                                    <apex:outputField value="{!station1.Station.Location__c}" />&nbsp;
+                                </div>
+                                <div>
+                                    <apex:outputField value="{!station1.Station.Account_Name__c}" />&nbsp;
+                                </div>
+                                <div>
+                                    <apex:outputField value="{!station1.Station.Phone__c}" />&nbsp;
+                                </div>
+                                <div>
+                                    <apex:outputField value="{!station1.Station.Street__c}" />&nbsp;
+                                </div>
+                                <div>
+                                    <apex:outputField value="{!station1.Station.City_State_Zip__c}" />&nbsp;
+                                </div>
+                                <!-- PRIMARY CONTACT -->
+                                <apex:outputPanel layout="none" rendered="{!station1.PrimaryContact != null}">
+                                    <div>
+                                        <apex:outputField value="{!station1.PrimaryContact.FirstName}" />&nbsp;<apex:outputField value="{!station1.PrimaryContact.LastName}" />
+                                    </div>
+                                    <div>
+                                        {!station1.PrimaryContact.Email}&nbsp;
+                                    </div>
+                                    <div>
+                                        <apex:outputField value="{!station1.PrimaryContact.Phone}" />&nbsp;
+                                    </div>
+                                </apex:outputPanel>
+                                <!-- /PRIMARY CONTACT -->
+                                <!-- SECONDARY CONTACT -->
+                                <apex:outputPanel layout="none" rendered="{!station1.SecondaryContact != null}">
+                                    <div>
+                                        <apex:outputField value="{!station1.SecondaryContact.FirstName}" />&nbsp;<apex:outputField value="{!station1.SecondaryContact.LastName}" />
+                                    </div>
+                                    <div>
+                                        {!station1.SecondaryContact.Email}&nbsp;
+                                    </div>
+                                    <div>
+                                        <apex:outputField value="{!station1.SecondaryContact.Phone}" />&nbsp;
+                                    </div>
+                                </apex:outputPanel>
+                                <!-- /SECONDARY CONTACT -->
+                            </div>
+                        </td>
+                    </apex:outputPanel>
+                    <td class="td4"></td>
+                    <td class="td3">
+                        <apex:outputPanel layout="none" rendered="{!station2 != null}">
+                            <div class="member-header">
+                                Station 2
+                            </div>
+                            <div class="member-content">
+                                <div>
+                                    <apex:outputField value="{!station2.Station.Location__c}" />&nbsp;
+                                </div>
+                                <div>
+                                    <apex:outputField value="{!station2.Station.Account_Name__c}" />&nbsp;
+                                </div>
+                                <div>
+                                    <apex:outputField value="{!station2.Station.Phone__c}" />&nbsp;
+                                </div>
+                                <div>
+                                    <apex:outputField value="{!station2.Station.Street__c}" />&nbsp;
+                                </div>
+                                <div>
+                                    <apex:outputField value="{!station2.Station.City_State_Zip__c}" />&nbsp;
+                                </div>
+                                <!-- PRIMARY CONTACT -->
+                                <apex:outputPanel layout="none" rendered="{!station2.PrimaryContact != null}">
+                                    <div>
+                                        <apex:outputField value="{!station2.PrimaryContact.FirstName}" />&nbsp;<apex:outputField value="{!station2.PrimaryContact.LastName}" />
+                                    </div>
+                                    <div>
+                                        {!station2.PrimaryContact.Email}&nbsp;
+                                    </div>
+                                    <div>
+                                        <apex:outputField value="{!station2.PrimaryContact.Phone}" />&nbsp;
+                                    </div>
+                                </apex:outputPanel>
+                                <!-- /PRIMARY CONTACT -->
+                                <!-- SECONDARY CONTACT -->
+                                <apex:outputPanel layout="none" rendered="{!station2.SecondaryContact != null}">
+                                    <div>
+                                        <apex:outputField value="{!station2.SecondaryContact.FirstName}" />&nbsp;<apex:outputField value="{!station2.SecondaryContact.LastName}" />
+                                    </div>
+                                    <div>
+                                        {!station2.SecondaryContact.Email}&nbsp;
+                                    </div>
+                                    <div>
+                                        <apex:outputField value="{!station2.SecondaryContact.Phone}" />&nbsp;
+                                    </div>
+                                </apex:outputPanel>
+                                <!-- /SECONDARY CONTACT -->
+                            </div>
+                        </apex:outputPanel>
+                    </td>
+                    <td class="td4"></td>
+                    <td class="td3">
+                        <apex:outputPanel layout="none" rendered="{!station3 != null}">
+                            <div class="member-header">
+                                Station 3
+                            </div>
+                            <div class="member-content">
+                                <div>
+                                    <apex:outputField value="{!station3.Station.Location__c}" />&nbsp;
+                                </div>
+                                <div>
+                                    <apex:outputField value="{!station3.Station.Account_Name__c}" />&nbsp;
+                                </div>
+                                <div>
+                                    <apex:outputField value="{!station3.Station.Phone__c}" />&nbsp;
+                                </div>
+                                <div>
+                                    <apex:outputField value="{!station3.Station.Street__c}" />&nbsp;
+                                </div>
+                                <div>
+                                    <apex:outputField value="{!station3.Station.City_State_Zip__c}" />&nbsp;
+                                </div>
+                                <!-- PRIMARY CONTACT -->
+                                <apex:outputPanel layout="none" rendered="{!station3.PrimaryContact != null}">
+                                    <div>
+                                        <apex:outputField value="{!station3.PrimaryContact.FirstName}" />&nbsp;<apex:outputField value="{!station3.PrimaryContact.LastName}" />
+                                    </div>
+                                    <div>
+                                        {!station3.PrimaryContact.Email}&nbsp;
+                                    </div>
+                                    <div>
+                                        <apex:outputField value="{!station3.PrimaryContact.Phone}" />&nbsp;
+                                    </div>
+                                </apex:outputPanel>
+                                <!-- /PRIMARY CONTACT -->
+                                <!-- SECONDARY CONTACT -->
+                                <apex:outputPanel layout="none" rendered="{!station3.SecondaryContact != null}">
+                                    <div>
+                                        <apex:outputField value="{!station3.SecondaryContact.FirstName}" />&nbsp;<apex:outputField value="{!station3.SecondaryContact.LastName}" />
+                                    </div>
+                                    <div>
+                                        {!station3.SecondaryContact.Email}&nbsp;
+                                    </div>
+                                    <div>
+                                        <apex:outputField value="{!station3.SecondaryContact.Phone}" />&nbsp;
+                                    </div>
+                                </apex:outputPanel>
+                                <!-- /SECONDARY CONTACT -->
+                            </div>
+                        </apex:outputPanel>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <!-- /STATIONS -->
+        <!-- CATERING INFO -->
+        <div class="no-break">
+            <div class="catering-info-header">
+                Catering Instructions
+            </div>
+            <div class="catering-info-content">
+                <div>
+                    <span style="font-weight:bold;">Advance Shipment:</span>&nbsp;              
+                    <apex:outputField value="{!packet.Advance_Shipment__c}" />
+                </div>
+                <apex:outputPanel layout="none" rendered="{!packet.Advance_Shipment__c == 'Yes'}">
+                    <div>
+                        <span style="font-weight:bold;">Advance Shipment Station:</span>&nbsp;              
+                        <apex:outputField value="{!packet.Advance_Shipment_Station__c}" />
+                    </div>
+                </apex:outputPanel>
+                <div class="break-small"></div>
+                <div>
+                    <apex:outputField value="{!packet.Catering_Instructions__c}" />
+                </div>
+            </div>
+        </div>
+        <!-- /CATERING INFO -->
+        <!-- MENU SECTIONS -->
+        <apex:repeat value="{!menuSections}" var="menuSection" id="menuSectionsRepeat">
+            <apex:outputPanel layout="none" rendered="{!menuSection.SectionName !='Nosh Bag'}">
+                <apex:outputPanel layout="none" rendered="{!menuSection.Items.size > 0}">
+                    <div class="no-break">
+                        <div class="lineitem-table-header">
+                            {!menuSection.SectionName}
+                        </div>	
+                        <table class="lineitem-table">
+                            <tr>
+                                <td class="td1" style="width:46%">Product</td>
+                                <td class="td1" style="width:9%">IT Code</td>
+                                <td class="td1" style="width:5%">F</td>
+                                <td class="td1" style="width:5%">M</td>
+                                <td class="td1" style="width:5%">Y</td>
+                                <td class="td1" style="width:7%">Quantity</td>
+                                <td class="td1">Notes</td>
+                            </tr>
+                            <apex:repeat value="{!menuSection.Items}" var="item" id="itemsRepeat">
+                                <tr>
+                                    <td>
+                                        <apex:outputPanel layout="none" rendered="{!item.Custom_Product__c == null && CONTAINS(item.Product_Name__c, 'Nosh')}">
+                                            <b><apex:outputField value="{!item.Product_Name__c}"/></b>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel layout="none" rendered="{!item.Custom_Product__c == null && !CONTAINS(item.Product_Name__c, 'Nosh')}">
+                                            <apex:outputField value="{!item.Product_Name__c}"/>
+                                        </apex:outputPanel>
+                                        <apex:outputText value="{!item.Custom_Product__c}" escape="false" rendered="{!item.Custom_Product__c != null}" />
+                                    </td>
+                                    <td>{!item.IT_Code__c}</td>
+                                    <td>{!item.F__c}</td>
+                                    <td>{!item.M__c}</td>
+                                    <td>{!item.Y__c}</td>
+                                    <td>{!item.Total_Quantity__c}</td>
+                                    <td>{!item.Notes__c}</td>
+                                </tr>
+                            </apex:repeat>
+                        </table>
+                    </div>
+                </apex:outputPanel>
+            </apex:outputPanel>
+            <apex:outputPanel layout="none" rendered="{!menuSection.SectionName =='Nosh Bag'}">
+                <apex:outputPanel layout="none" rendered="{!menuSection.Packetwrapperclasslist.size > 0}">
+                    <div class="no-break">
+                        <div class="lineitem-table-header">
+                            {!menuSection.SectionName}
+                        </div>	
+                        <table class="lineitem-table">
+                            <tr>
+                                <td class="td1" style="width:46%">Product</td>
+                                <td class="td1" style="width:9%">IT Code</td>
+                                <td class="td1" style="width:5%">F</td>
+                                <td class="td1" style="width:5%">M</td>
+                                <td class="td1" style="width:5%">Y</td>
+                                <td class="td1" style="width:7%">Quantity</td>
+                                <td class="td1">Notes</td>
+                            </tr>
+                            <apex:repeat value="{!menuSection.Packetwrapperclasslist}" var="item1" id="itemsRepeat1">
+                                <tr>
+                                    <td style="font-size: large;">
+                                        
+                                        <b> {!item1.mainpacket.Product__r.name}</b> 
+                                    </td>
+                                    <td>{!item1.mainpacket.IT_Code__c}</td>
+                                    <td>{!item1.mainpacket.F__c}</td>
+                                    <td>{!item1.mainpacket.M__c}</td>
+                                    <td>{!item1.mainpacket.Y__c}</td>
+                                    <td>{!item1.mainpacket.Total_Quantity__c}</td>
+                                    <td>{!item1.mainpacket.Notes__c}</td>
+                                </tr>
+                                
+                                <td colspan="7">
+                                    <table class="lineitem-table">
+                                        <tr>
+                                            <td class="td1" style="width:46%">Product</td>
+                                            <td class="td1" style="width:9%">IT Code</td>
+                                            <td class="td1" style="width:5%">F</td>
+                                            <td class="td1" style="width:5%">M</td>
+                                            <td class="td1" style="width:5%">Y</td>
+                                            <td class="td1" style="width:7%">Quantity</td>
+                                            <td class="td1">Notes</td>
+                                        </tr>
+                                        <apex:repeat value="{!item1.Childpacketlist}" var="item2" id="itemsRepeat1">
+                                            <tr>
+                                                <td>
+                                                    
+                                                    {!item2.Product__r.name}
+                                                </td>
+                                                <td>{!item2.IT_Code__c}</td>
+                                                <td>{!item2.F__c}</td>
+                                                <td>{!item2.M__c}</td>
+                                                <td>{!item2.Y__c}</td>
+                                                <td>{!item2.Total_Quantity__c}</td>
+                                                <td>{!item2.Notes__c}</td>
+                                            </tr>
+                                        </apex:repeat>
+                                    </table>
+                                </td>
+                            </apex:repeat>
+                        </table>
+                    </div>
+                </apex:outputPanel>
+            </apex:outputPanel>
+        </apex:repeat>
+        <!-- /MENU SECTIONS -->
+    </body>
+</apex:page>

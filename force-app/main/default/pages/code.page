@@ -1,0 +1,29 @@
+<apex:page standardController="Account" sidebar="True" id="MyThirdPage" recordSetVar="records">
+ <apex:form id="MythirdForm">
+    <apex:pageBlock id="MyThridPG">
+      <apex:pageblocksection >
+        <apex:pageblockTable id="MyThirdPGT" value="{!records}" var="record">
+           <apex:column >
+              <apex:outputField value="{!record.Name}" Id="MyOF1"/>
+              <apex:facet name="header">Name</apex:facet>
+           </apex:column>
+           <apex:column >
+              <apex:outputField value="{!record.Type}" Id="MyOF2"/>
+              <apex:facet name="header">Type</apex:facet>
+           </apex:column>
+           <apex:column >
+              <apex:outputField value="{!record.Industry}" Id="MyOF3"/>
+              <apex:facet name="header">Industry</apex:facet>
+           </apex:column>
+           
+          <apex:inlineEditSupport id="MyThirdInlineedit" event="ondblclick" showOnEdit="Savebutton , CancelButton" hideOnEdit="editbutton"/>
+        </apex:pageblockTable>
+     </apex:pageblocksection>
+     <apex:pageBlockButtons >
+       <apex:commandButton value="Save" action="{!save}" id="Savebutton"/>
+       <apex:commandButton value="Cancel" action="{!cancel}" id="CancelButton"/>
+       <apex:commandButton value="Edit" action="{!edit}" id="editbutton"/>
+     </apex:pageBlockButtons>
+   </apex:pageBlock>
+ </apex:form>
+</apex:page>

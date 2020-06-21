@@ -1,0 +1,29 @@
+<apex:page id="My_Page" title="My first page" sidebar="false" tabstyle="Account" standardController="Account">
+<apex:form >
+This is your new page <br></br>
+
+<apex:pageBlock title="New Account">
+<apex:pageBlockSection title="Account details" collapsible="True" columns="2">
+<apex:Inputfield value="{!account.Name}"/>
+
+</apex:pageBlockSection>
+<apex:pageBlockSection title="Account Billing details" collapsible="true" columns="2">
+<apex:InputField value="{!account.BillingStreet}"/>
+<apex.InputField value="{!account.BillingCity}"/>
+<apex:InputField value="{!account.Billingstate}"/>
+<apex:InputField value="{!account.billingCountry}"/>
+</apex:pageBlockSection>
+
+<apex:pageBlockButtons >
+<apex:commandButton value="Save" action="(!save)"/>
+<apex:commandButton value="cancel" action="(!cancel)"/>
+</apex:pageBlockButtons> 
+</apex:pageBlock>
+
+
+
+
+
+
+</apex:form>
+</apex:page>

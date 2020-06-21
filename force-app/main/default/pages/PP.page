@@ -1,0 +1,35 @@
+<apex:page standardController="Account">
+<apex:form >
+ <apex:pageBlock id="PG1" title="{!$User.FirstName} details">
+    <p><b>Below are the Contact details for an Account.</b></p>
+ </apex:pageBlock> 
+ <apex:pageBlock title="Contact details.">
+  <apex:datatable value="{!account.Contacts}" var="contact" cellpadding="6" border="2" columns="3" width="100%" bgcolor="Red">
+    <apex:column >
+      <apex:facet Name="header">Contact Name</apex:facet>
+      <apex:commandLink >
+        {!contact.Name}
+        <apex:param value="{!contact.Id}" name="cid"/>
+      </apex:commandLink>
+    </apex:column>
+    <apex:column >
+      <apex:facet Name="header">
+      
+      
+      
+      
+      
+      
+      </apex:facet>
+        {!contact.Phone}
+    </apex:column>
+    <apex:column >
+      <apex:facet Name="header">Email</apex:facet>
+        {!contact.email}
+    </apex:column>
+  
+  </apex:datatable>
+ </apex:pageBlock>
+ <apex:detail id="MyFifthPagedetail" relatedList="false" title="true" subject="{!$CurrentPage.parameters.Id}"/>
+</apex:form>
+</apex:page>

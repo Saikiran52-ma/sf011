@@ -1,0 +1,16 @@
+<apex:page controller="MyFirstCustomController" sidebar="true" id="My_CC" >
+ <apex:form >
+   <apex:pageBlock title="My page Block" mode="edit" id="MyPG_CC">
+    <apex:pageMessages />
+    <apex:pageblocksection >
+      <apex:inputField value="{!Account.Name}"/>
+      <apex:inputField value="{!Account.Phone}"/>
+      <apex:inputField value="{!Account.Industry}"/>
+    </apex:pageblocksection>
+    
+    <apex:pageblockbuttons >
+       <apex:commandButton value="Save" action="{!save}"/>
+    </apex:pageblockbuttons>
+   </apex:pageBlock>
+ </apex:form>
+</apex:page>
