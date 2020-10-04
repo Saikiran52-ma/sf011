@@ -6,6 +6,7 @@ public class BaseObjectBatch implements Database.Batchable<Base_Object__c>, Data
 	String uploadType;
 	
 	public BaseObjectBatch(List<Base_Object__c> objs) {
+		// Test
 		this.objs = objs;
 		this.failObjs = new Map<Base_Object__c, String>();
 		this.successObjs = new List<Base_Object__c>();
