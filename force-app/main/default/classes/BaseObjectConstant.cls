@@ -1,5 +1,5 @@
 public class BaseObjectConstant {
-// Test2
+// Test2kjasdhsad
 	// Upload types
 	public static final String UPLOADTYPE_CONTRACT = 'Contract';
 	public static final String UPLOADTYPE_FLIGHT = 'Flight';
