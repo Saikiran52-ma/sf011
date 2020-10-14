@@ -12,6 +12,7 @@ public class BaseObjectConstant {
 	public static final String PACKETMEMBERTYPE_CATERER = 'Caterer Contact';
 
 	// Packet statuses (Packet__c.Packet_Status__c)
+	//Sai Kiran
 	public static final String PACKET_STATUS_DRAFT = 'Draft';
 	public static final String PACKET_STATUS_INPROGRESS = 'In Progress';
 	public static final String PACKET_STATUS_COMPLETED = 'Completed';
