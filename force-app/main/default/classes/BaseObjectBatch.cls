@@ -4,6 +4,8 @@ public class BaseObjectBatch implements Database.Batchable<Base_Object__c>, Data
 	Map<Base_Object__c, String> failObjs;
 	Datetime submittedDate;
 	String uploadType;
+	//Sai-1
+	//Sai-2
 	
 	public BaseObjectBatch(List<Base_Object__c> objs) {
 		// Test
